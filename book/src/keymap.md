@@ -457,8 +457,8 @@ See the documentation page on [pickers](./pickers.md) for more info.
 
 | Key                          | Description                                                |
 | -----                        | -------------                                              |
-| `Shift-Tab`, `Up`, `Ctrl-p`  | Previous entry                                             |
-| `Tab`, `Down`, `Ctrl-n`      | Next entry                                                 |
+| `Shift-Tab`, `Up`, `Ctrl-p`, `Ctrl-k`  | Previous entry                                             |
+| `Tab`, `Down`, `Ctrl-n`, `Ctrl-j`      | Next entry                                                 |
 | `PageUp`, `Ctrl-u`           | Page up                                                    |
 | `PageDown`, `Ctrl-d`         | Page down                                                  |
 | `Home`                       | Go to first entry                                          |
