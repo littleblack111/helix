@@ -700,7 +700,7 @@ impl Component for Prompt {
                     return close_fn;
                 }
             }
-            ctrl!('k') | key!(Up) => {
+            ctrl!('p') | ctrl!('k') | key!(Up) => {
                 if let Some(register) = self.history_register {
                     self.change_history(cx, register, CompletionDirection::Backward);
                 }
