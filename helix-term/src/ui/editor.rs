@@ -1,6 +1,7 @@
 use crate::{
     commands::{self, OnKeyCallback, OnKeyCallbackKind},
     compositor::{Component, Context, Event, EventResult},
+    ctrl,
     events::{OnModeSwitch, PostCommand},
     handlers::completion::CompletionItem,
     key,
@@ -1423,7 +1424,7 @@ impl Component for EditorView {
                                         consumed = true;
                                         Some(callback)
                                     } else if let EventResult::Consumed(callback) =
-                                        completion.handle_event(&Event::Key(key!(Enter)), &mut cx)
+                                        completion.handle_event(&Event::Key(ctrl!('y')), &mut cx)
                                     {
                                         Some(callback)
                                     } else {
