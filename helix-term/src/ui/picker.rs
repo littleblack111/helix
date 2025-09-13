@@ -1086,7 +1086,7 @@ impl<I: 'static + Send + Sync, D: 'static + Send + Sync> Component for Picker<I,
                     (self.callback_fn)(ctx, option, self.default_action);
                 }
             }
-			ctrl!('y') => {
+            key!(Enter) => {
                 // If the prompt has a history completion and is empty, use enter to accept
                 // that completion
                 if let Some(completion) = self
