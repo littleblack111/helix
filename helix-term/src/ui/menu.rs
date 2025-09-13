@@ -245,7 +245,7 @@ impl<T: Item + 'static> Component for Menu<T> {
                 (self.callback_fn)(cx.editor, self.selection(), MenuEvent::Update);
                 return EventResult::Consumed(None);
             }
-            key!(Tab) | ctrl!('n') | ctrl!('j') => {
+            ctrl!('n') | ctrl!('j') => {
                 // arrow down/ctrl-n/tab advances completion choice (including updating the doc)
                 self.move_down();
                 (self.callback_fn)(cx.editor, self.selection(), MenuEvent::Update);
