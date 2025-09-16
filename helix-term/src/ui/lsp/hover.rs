@@ -141,7 +141,7 @@ impl Component for Hover {
         };
 
         match event {
-            alt!('p') => {
+            alt!('k') => {
                 let index = self
                     .active_index
                     .checked_sub(1)
@@ -149,7 +149,7 @@ impl Component for Hover {
                 self.set_index(index);
                 EventResult::Consumed(None)
             }
-            alt!('n') => {
+            alt!('j') => {
                 self.set_index((self.active_index + 1) % self.contents.len());
                 EventResult::Consumed(None)
             }
