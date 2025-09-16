@@ -78,14 +78,14 @@ impl Component for SignatureHelp {
         }
 
         match event {
-            alt!('p') => {
+            alt!('k') => {
                 self.active_signature = self
                     .active_signature
                     .checked_sub(1)
                     .unwrap_or(self.signatures.len() - 1);
                 EventResult::Consumed(None)
             }
-            alt!('n') => {
+            alt!('j') => {
                 self.active_signature = (self.active_signature + 1) % self.signatures.len();
                 EventResult::Consumed(None)
             }
