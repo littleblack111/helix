@@ -1,6 +1,7 @@
 use crate::{
     commands::{self, OnKeyCallback, OnKeyCallbackKind},
     compositor::{Component, Context, Event, EventResult},
+    ctrl,
     events::{OnModeSwitch, PostCommand},
     handlers::completion::CompletionItem,
     key,
@@ -521,9 +522,7 @@ impl EditorView {
 
         // Statusline on the last row of the view area.
         // The cmdline space reservation is handled at the top level in EditorView::render.
-        let statusline_area = view
-            .area
-            .clip_top(view.area.height.saturating_sub(1));
+        let statusline_area = view.area.clip_top(view.area.height.saturating_sub(1));
 
         let mut context =
             statusline::RenderContext::new(editor, doc, view, is_focused, &self.spinners);
@@ -1012,21 +1011,22 @@ impl EditorView {
         }
 
         // Determine scroll offset
-        let scroll_offset = if let Some(current_idx) = editor.documents().position(|d| d.id() == current_doc) {
-            if let Some(&target_x) = self.bufferline_positions.get(current_idx) {
-                if target_x >= viewport.width / 2 {
-                    target_x
-                        .saturating_sub(viewport.width / 2)
-                        .min(total_width.saturating_sub(viewport.width))
+        let scroll_offset =
+            if let Some(current_idx) = editor.documents().position(|d| d.id() == current_doc) {
+                if let Some(&target_x) = self.bufferline_positions.get(current_idx) {
+                    if target_x >= viewport.width / 2 {
+                        target_x
+                            .saturating_sub(viewport.width / 2)
+                            .min(total_width.saturating_sub(viewport.width))
+                    } else {
+                        0
+                    }
                 } else {
                     0
                 }
             } else {
                 0
-            }
-        } else {
-            0
-        };
+            };
 
         // Second pass: render with the calculated offset
         for (idx, doc) in editor.documents().enumerate() {
@@ -1036,10 +1036,18 @@ impl EditorView {
             // Render separator if not first document
             if idx > 0 {
                 let sep = &editor.config().bufferline.separator;
-                let sep_x = buffer_x.saturating_sub(sep.len() as u16).saturating_sub(scroll_offset);
+                let sep_x = buffer_x
+                    .saturating_sub(sep.len() as u16)
+                    .saturating_sub(scroll_offset);
                 if sep_x < viewport.width {
                     let render_x = viewport.x + sep_x;
-                    surface.set_stringn(render_x, viewport.y, sep, (viewport.width - sep_x) as usize, bufferline_inactive);
+                    surface.set_stringn(
+                        render_x,
+                        viewport.y,
+                        sep,
+                        (viewport.width - sep_x) as usize,
+                        bufferline_inactive,
+                    );
                 }
             }
 
@@ -1083,8 +1091,10 @@ impl EditorView {
 
             // Track buffer info for mouse clicks (adjust for scroll offset)
             let start_x = actual_render_x;
-            let end_x = (actual_render_x + visible_text.len() as u16).min(viewport.x + viewport.width);
-            self.bufferline_info.add_buffer_info(doc.id(), start_x..end_x);
+            let end_x =
+                (actual_render_x + visible_text.len() as u16).min(viewport.x + viewport.width);
+            self.bufferline_info
+                .add_buffer_info(doc.id(), start_x..end_x);
         }
     }
 
@@ -1662,7 +1672,9 @@ impl EditorView {
                 let config = editor.config();
                 let bufferline_visible = match config.bufferline.render_mode {
                     helix_view::editor::BufferLineRenderMode::Always => true,
-                    helix_view::editor::BufferLineRenderMode::Multiple => editor.documents.len() > 1,
+                    helix_view::editor::BufferLineRenderMode::Multiple => {
+                        editor.documents.len() > 1
+                    }
                     _ => false,
                 };
                 if bufferline_visible && row == 0 {
@@ -1938,7 +1950,7 @@ impl Component for EditorView {
                                         consumed = true;
                                         Some(callback)
                                     } else if let EventResult::Consumed(callback) =
-                                        completion.handle_event(&Event::Key(key!(Enter)), &mut cx)
+                                        completion.handle_event(&Event::Key(ctrl!('y')), &mut cx)
                                     {
                                         Some(callback)
                                     } else {
@@ -2058,7 +2070,7 @@ impl Component for EditorView {
         } else {
             area.clip_bottom(1) // Reserve for commandline
         };
-        
+
         if use_bufferline {
             editor_area = editor_area.clip_top(1);
         }
@@ -2147,7 +2159,7 @@ impl Component for EditorView {
 
         // Cleanup expired notifications before rendering
         cx.editor.cleanup_notifications();
-        
+
         // Render notification popup
         self.notification_popup.render(area, surface, cx);
     }
@@ -2196,7 +2208,6 @@ struct BufferInfo {
     // The bufferline column span used to show the document name
     columns: std::ops::Range<u16>,
 }
-
 
 fn canonicalize_key(key: &mut KeyEvent) {
     if let KeyEvent {
