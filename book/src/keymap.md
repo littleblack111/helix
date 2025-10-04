@@ -336,8 +336,8 @@ Displays documentation for the selected completion item. Remapping currently not
 
 | Key                         | Description                      |
 | ----                        | -----------                      |
-| `Shift-Tab`, `Ctrl-p`, `Up` | Previous entry                   |
-| `Tab`, `Ctrl-n`, `Down`     | Next entry                       |
+| `Shift-Tab`, `Ctrl-k`, `Up` | Previous entry                   |
+| `Tab`, `Ctrl-j`, `Down`     | Next entry                       |
 | `Enter`                     | Close menu and accept completion |
 | `Ctrl-c`                    | Close menu and reject completion |
 
