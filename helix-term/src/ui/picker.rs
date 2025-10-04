@@ -724,10 +724,20 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
             // Render gradient border with title support
             if let Some(ref mut gradient_border) = self.gradient_border {
                 let title_text = self.title.as_ref().map(|spans| {
-                    spans.0.iter().map(|span| span.content.as_ref()).collect::<String>()
+                    spans
+                        .0
+                        .iter()
+                        .map(|span| span.content.as_ref())
+                        .collect::<String>()
                 });
                 let rounded = cx.editor.config().rounded_corners;
-                gradient_border.render_with_title(area, surface, &cx.editor.theme, title_text.as_deref(), rounded);
+                gradient_border.render_with_title(
+                    area,
+                    surface,
+                    &cx.editor.theme,
+                    title_text.as_deref(),
+                    rounded,
+                );
             }
 
             // Calculate inner area manually (same as Block::inner)
@@ -740,10 +750,14 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
         } else {
             // Use traditional border
             let border_type = BorderType::new(cx.editor.config().rounded_corners);
-            let block: Block<'_> = self.title.as_ref().map_or(
-                Block::bordered().border_type(border_type),
-                |title| Block::bordered().border_type(border_type).title(title.clone())
-            );
+            let block: Block<'_> =
+                self.title
+                    .as_ref()
+                    .map_or(Block::bordered().border_type(border_type), |title| {
+                        Block::bordered()
+                            .border_type(border_type)
+                            .title(title.clone())
+                    });
 
             let inner = block.inner(area);
             block.render(area, surface);
@@ -1161,10 +1175,10 @@ impl<I: 'static + Send + Sync, D: 'static + Send + Sync> Component for Picker<I,
         };
 
         match key_event {
-            shift!(Tab) | key!(Up) | ctrl!('p') => {
+            shift!(Tab) | key!(Up) | ctrl!('k') => {
                 self.move_by(1, Direction::Backward);
             }
-            key!(Tab) | key!(Down) | ctrl!('n') => {
+            key!(Tab) | key!(Down) | ctrl!('j') => {
                 self.move_by(1, Direction::Forward);
             }
             key!(PageDown) | ctrl!('d') => {
@@ -1237,7 +1251,11 @@ impl<I: 'static + Send + Sync, D: 'static + Send + Sync> Component for Picker<I,
             }
             _ => {
                 // Check if this is an Esc key that should close the picker
-                if let Event::Key(KeyEvent { code: KeyCode::Esc, modifiers: KeyModifiers::NONE }) = event {
+                if let Event::Key(KeyEvent {
+                    code: KeyCode::Esc,
+                    modifiers: KeyModifiers::NONE,
+                }) = event
+                {
                     return close_fn(self);
                 }
                 self.prompt_handle_event(event, ctx);
