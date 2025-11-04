@@ -1182,10 +1182,10 @@ impl<I: 'static + Send + Sync, D: 'static + Send + Sync> Component for Picker<I,
         }
 
         match key_event {
-            shift!(Tab) | key!(Up) | ctrl!('k') => {
+            ctrl!('k') | alt!('k') => {
                 self.move_by(1, Direction::Backward);
             }
-            key!(Tab) | key!(Down) | ctrl!('j') => {
+            ctrl!('j') | alt!('j') => {
                 self.move_by(1, Direction::Forward);
             }
             key!(PageDown) | ctrl!('d') => {

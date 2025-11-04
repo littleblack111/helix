@@ -2378,7 +2378,8 @@ fn index(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow
     };
 
     let start = if let Some(arg) = args.get_flag("start") {
-        arg.parse().context("Argument to --start must be an integer")?
+        arg.parse()
+            .context("Argument to --start must be an integer")?
     } else {
         1
     };
@@ -2937,38 +2938,54 @@ const WRITE_NO_FORMAT_FLAG: Flag = Flag {
     ..Flag::DEFAULT
 };
 
-fn notifications_history(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
+fn notifications_history(
+    cx: &mut compositor::Context,
+    _args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
     if event != PromptEvent::Validate {
         return Ok(());
     }
-    
+
     crate::commands::notification::show_notification_history(cx);
     Ok(())
 }
 
-fn notifications_clear(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
+fn notifications_clear(
+    cx: &mut compositor::Context,
+    _args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
     if event != PromptEvent::Validate {
         return Ok(());
     }
-    
+
     crate::commands::notification::clear_notification_history(cx);
     Ok(())
 }
 
-fn notifications_dismiss(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
+fn notifications_dismiss(
+    cx: &mut compositor::Context,
+    _args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
     if event != PromptEvent::Validate {
         return Ok(());
     }
-    
+
     crate::commands::notification::dismiss_all_notifications(cx);
     Ok(())
 }
 
-fn notifications_test(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
+fn notifications_test(
+    cx: &mut compositor::Context,
+    _args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
     if event != PromptEvent::Validate {
         return Ok(());
     }
-    
+
     crate::commands::notification::test_notifications(cx);
     Ok(())
 }

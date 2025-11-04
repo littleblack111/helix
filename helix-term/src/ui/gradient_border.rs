@@ -1,7 +1,7 @@
 use helix_view::{
     editor::{GradientBorderConfig, GradientDirection},
     graphics::{Color, Rect, Style},
-    theme::{Theme, Modifier},
+    theme::{Modifier, Theme},
 };
 use tui::buffer::Buffer as Surface;
 
@@ -53,11 +53,9 @@ impl GradientBorder {
     }
 
     /// Compute cached RGB values from config (with sensible fallbacks)
-    fn compute_cached_colors(config: &GradientBorderConfig) -> (
-        (u8, u8, u8),
-        (u8, u8, u8),
-        Option<(u8, u8, u8)>,
-    ) {
+    fn compute_cached_colors(
+        config: &GradientBorderConfig,
+    ) -> ((u8, u8, u8), (u8, u8, u8), Option<(u8, u8, u8)>) {
         let start_rgb = Self::parse_hex_color(&config.start_color).unwrap_or((138, 43, 226));
         let end_rgb = Self::parse_hex_color(&config.end_color).unwrap_or((0, 191, 255));
         let middle_rgb = if config.middle_color.is_empty() {
@@ -69,11 +67,7 @@ impl GradientBorder {
     }
 
     /// Interpolate between two colors
-    fn interpolate_color(
-        start: (u8, u8, u8),
-        end: (u8, u8, u8),
-        ratio: f32,
-    ) -> Color {
+    fn interpolate_color(start: (u8, u8, u8), end: (u8, u8, u8), ratio: f32) -> Color {
         let ratio = ratio.clamp(0.0, 1.0);
         let r = (start.0 as f32 + (end.0 as f32 - start.0 as f32) * ratio) as u8;
         let g = (start.1 as f32 + (end.1 as f32 - start.1 as f32) * ratio) as u8;
@@ -118,8 +112,8 @@ impl GradientBorder {
                 (base_ratio + animation_offset) % 1.0
             }
             GradientDirection::Diagonal => {
-                let base_ratio = ((x - area.x) + (y - area.y)) as f32
-                    / (area.width + area.height).max(1) as f32;
+                let base_ratio =
+                    ((x - area.x) + (y - area.y)) as f32 / (area.width + area.height).max(1) as f32;
                 (base_ratio + animation_offset) % 1.0
             }
             GradientDirection::Radial => {
@@ -127,7 +121,7 @@ impl GradientBorder {
                 let center_y = area.y + area.height / 2;
                 let distance = ((x as f32 - center_x as f32).powi(2)
                     + (y as f32 - center_y as f32).powi(2))
-                    .sqrt();
+                .sqrt();
                 let max_distance = (area.width.max(area.height) / 2) as f32;
                 let base_ratio = (distance / max_distance.max(1.0)).min(1.0);
                 (base_ratio + animation_offset) % 1.0
@@ -147,15 +141,15 @@ impl GradientBorder {
         match (thickness, rounded) {
             // Thickness 1 - thin borders
             (1, false) => vec!["─", "│", "┌", "┐", "└", "┘"], // thin square
-            (1, true) => vec!["─", "│", "╭", "╮", "╰", "╯"], // thin rounded
+            (1, true) => vec!["─", "│", "╭", "╮", "╰", "╯"],  // thin rounded
 
             // Thickness 2 - thick borders
             (2, false) => vec!["━", "┃", "┏", "┓", "┗", "┛"], // thick square
-            (2, true) => vec!["━", "┃", "┏", "┓", "┗", "┛"], // thick (no rounded equivalent)
+            (2, true) => vec!["━", "┃", "┏", "┓", "┗", "┛"],  // thick (no rounded equivalent)
 
             // Thickness 3 - double borders
             (3, false) => vec!["═", "║", "╔", "╗", "╚", "╝"], // double square
-            (3, true) => vec!["═", "║", "╔", "╗", "╚", "╝"], // double (no rounded equivalent)
+            (3, true) => vec!["═", "║", "╔", "╗", "╚", "╝"],  // double (no rounded equivalent)
 
             // Thickness 4 - block characters
             (4, _) => vec!["▄", "█", "█", "█", "█", "█"], // block (rounded doesn't apply)
@@ -175,9 +169,14 @@ impl GradientBorder {
         }
 
         let border_chars = Self::get_border_chars(self.config.thickness, rounded);
-        let [horizontal, vertical, top_left, top_right, bottom_left, bottom_right] =
-            [border_chars[0], border_chars[1], border_chars[2],
-             border_chars[3], border_chars[4], border_chars[5]];
+        let [horizontal, vertical, top_left, top_right, bottom_left, bottom_right] = [
+            border_chars[0],
+            border_chars[1],
+            border_chars[2],
+            border_chars[3],
+            border_chars[4],
+            border_chars[5],
+        ];
 
         // Render top border
         for x in area.left()..area.right() {
@@ -237,7 +236,14 @@ impl GradientBorder {
     }
 
     /// Render gradient border with title (for pickers with titles)
-    pub fn render_with_title(&mut self, area: Rect, surface: &mut Surface, theme: &Theme, title: Option<&str>, rounded: bool) {
+    pub fn render_with_title(
+        &mut self,
+        area: Rect,
+        surface: &mut Surface,
+        theme: &Theme,
+        title: Option<&str>,
+        rounded: bool,
+    ) {
         self.render(area, surface, theme, rounded);
 
         // If there's a title, render it centered in the top border
@@ -246,9 +252,9 @@ impl GradientBorder {
                 // Center the title
                 let title_start = area.x + (area.width.saturating_sub(title.len() as u16)) / 2;
                 let title_color = self.get_gradient_color(title_start, area.y, area);
-                let title_style = Style::default().fg(title_color).add_modifier(
-                    Modifier::BOLD
-                );
+                let title_style = Style::default()
+                    .fg(title_color)
+                    .add_modifier(Modifier::BOLD);
 
                 // Clear the area for the title and render it
                 for (i, ch) in title.chars().enumerate() {

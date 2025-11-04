@@ -7575,9 +7575,9 @@ fn jump_to_label(cx: &mut Context, labels: Vec<Range>, behaviour: Movement) {
             // 2. We are in the new row (including corner)
             //    => size of extended inner square + pos in row.
             let index = if outer > inner {
-                outer*outer + inner
+                outer * outer + inner
             } else {
-                inner*(inner+1) + outer
+                inner * (inner + 1) + outer
             };
             if let Some(mut range) = labels.get(index).copied() {
                 range = if behaviour == Movement::Extend {

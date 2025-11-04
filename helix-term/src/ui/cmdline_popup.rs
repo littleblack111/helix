@@ -87,7 +87,7 @@ impl CmdlinePopup {
             match self.prompt.prompt() {
                 s if s.starts_with("search:") || s == "Search" => &config.search,
                 s if s == "Cmdline" => &config.command,
-                _ => &config.general
+                _ => &config.general,
             }
         }
     }
@@ -113,7 +113,13 @@ impl CmdlinePopup {
             // Render gradient border with title
             if let Some(ref mut gradient_border) = self.gradient_border {
                 let rounded = cx.editor.config().rounded_corners;
-                gradient_border.render_with_title(popup_area, surface, theme, Some(self.prompt.prompt()), rounded);
+                gradient_border.render_with_title(
+                    popup_area,
+                    surface,
+                    theme,
+                    Some(self.prompt.prompt()),
+                    rounded,
+                );
             }
 
             // Calculate inner area manually using configured gradient thickness
@@ -152,18 +158,17 @@ impl CmdlinePopup {
             ""
         };
         // Render icon without trailing space to avoid extra padding before input
-        let prefix_text = if icon.is_empty() { "".to_string() } else { icon.to_string() };
+        let prefix_text = if icon.is_empty() {
+            "".to_string()
+        } else {
+            icon.to_string()
+        };
 
         if !prefix_text.is_empty() {
             let prompt_color = theme.get("ui.text.focus");
             // Make the icon more prominent with bold styling
             let icon_style = prompt_color.add_modifier(helix_view::theme::Modifier::BOLD);
-            surface.set_string(
-                inner_area.x,
-                inner_area.y,
-                &prefix_text,
-                icon_style,
-            );
+            surface.set_string(inner_area.x, inner_area.y, &prefix_text, icon_style);
         }
 
         // Calculate input area
@@ -252,17 +257,17 @@ impl CmdlinePopup {
         let config = cx.editor.config();
         let picker_symbol = config.picker_symbol.as_str();
         let symbol_width = picker_symbol.width();
-        
+
         let completions = self.prompt.completions();
         let selected_index = self.prompt.selection().unwrap_or(0);
-        
+
         // Calculate scroll offset to keep selected item visible within the fixed window
         let scroll_offset = if selected_index >= max_display_items {
             selected_index.saturating_sub(max_display_items - 1)
         } else {
             0
         };
-        
+
         // Render visible completion items
         for (display_idx, (completion_idx, (_range, completion))) in completions
             .iter()
@@ -299,11 +304,11 @@ impl CmdlinePopup {
                 item_style,
             );
         }
-        
+
         // Add scroll indicators if there are more items
         if total_items > max_display_items {
             let scroll_indicator_style = theme.get("ui.text.inactive");
-            
+
             // Show up arrow if we can scroll up
             if scroll_offset > 0 {
                 surface.set_string(
@@ -313,7 +318,7 @@ impl CmdlinePopup {
                     scroll_indicator_style,
                 );
             }
-            
+
             // Show down arrow if we can scroll down
             if scroll_offset + max_display_items < total_items {
                 surface.set_string(
