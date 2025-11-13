@@ -48,7 +48,7 @@ use helix_core::{
 use helix_view::{
     editor::Action,
     graphics::{CursorKind, Margin, Modifier, Rect},
-    input::KeyEvent,
+    input::{KeyCode, KeyEvent, KeyModifiers},
     theme::Style,
     view::ViewPosition,
     Document, DocumentId, Editor,
@@ -727,21 +727,8 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
             }
 
             if let Some(ref mut gradient_border) = self.gradient_border {
-                let title_text = self.title.as_ref().map(|spans| {
-                    spans
-                        .0
-                        .iter()
-                        .map(|span| span.content.as_ref())
-                        .collect::<String>()
-                });
                 let rounded = cx.editor.config().rounded_corners;
-                gradient_border.render_with_title(
-                    area,
-                    surface,
-                    &cx.editor.theme,
-                    title_text.as_deref(),
-                    rounded,
-                );
+                gradient_border.render(area, surface, &cx.editor.theme, rounded);
             }
 
             let t: u16 = cx.editor.config().gradient_borders.thickness as u16;
@@ -754,18 +741,11 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
         } else {
             // Use traditional border
             let border_type = BorderType::new(cx.editor.config().rounded_corners);
-            let block: Block<'_> =
-                self.title
-                    .as_ref()
-                    .map_or(Block::bordered().border_type(border_type), |title| {
-                        Block::bordered()
-                            .border_type(border_type)
-                            .title(title.clone())
-                    });
+            let block: Block<'_> = Block::bordered().border_type(border_type);
 
             let inner = block.inner(area);
             block.render(area, surface);
-            inner_area
+            inner
         };
 
         // -- Render the input bar:
